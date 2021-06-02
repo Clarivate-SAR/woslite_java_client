@@ -1,0 +1,1242 @@
+openapi: 3.0.3
+info:
+  description: "A responsive API that supports rich searching across the Web of Science\
+    \ Core Collection to retrieve core article metadata. \nThis service provides a\
+    \ great way to reuse Web of Science data both internally and externally to enhance\
+    \ \ninstitutional repositories and research networking systems with best-in-class\
+    \ data.\nThis API supports searching across the Web of Science to retrieve item-level\n\
+    metadata with limited fields: \n- UT (Unique Identifier)\n- Authors\n- Author\
+    \ keywords\n- Document type\n- Title\n- Issue\n- Pages\n- Publication date\n-\
+    \ Source title\n- Volume\n- DOI\n- ISBN\n- ISSN \n\nThe API supports JSON and\
+    \ XML responses, and this\ndocumentation supports trying both response types.\n"
+  title: Web of Science API Lite
+  version: "1.0"
+servers:
+- url: https://api.clarivate.com/api/woslite
+security:
+- key: []
+tags:
+- description: Supports discovery and interrogation of the data.
+  name: Search
+- description: Supports integration and data supplement activities.
+  name: Integration
+paths:
+  /:
+    get:
+      description: The search operation submits a search query to the specified database
+        edition and retrieves data. This operation returns a query ID that can be
+        used in subsequent operations to retrieve more records.
+      externalDocs:
+        description: Query examples
+        url: http://images.webofknowledge.com//WOKRS529AR7/help/WOS/hp_advanced_examples.html
+      parameters:
+      - description: 'Database to search. Must be a valid database ID, one of the
+          following: BCI/BIOABS/BIOSIS/CCC/DCI/DIIDW/MEDLINE/WOK/WOS/ZOOREC. WOK represents
+          all databases.'
+        explode: true
+        in: query
+        name: databaseId
+        required: true
+        schema:
+          type: string
+        style: form
+      - description: 'Language of search. This element can take only one value: en
+          for English. If no language is specified, English is passed by default.'
+        explode: true
+        in: query
+        name: lang
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 'User query for requesting data, ex: TS=(cadmium). The query
+          parser will return errors for invalid queries.'
+        explode: true
+        in: query
+        name: usrQuery
+        required: true
+        schema:
+          type: string
+        style: form
+      - description: 'Edition(s) to be searched. If null, user permissions will be
+          substituted. Must include the name of the collection and edition name separated
+          by ''+'', ex: WOS+SCI. Multiple editions are separated by '',''. Editions
+          available for collection(WOS) - AHCI,CCR,IC,ISSHP,ISTP,SCI,SSCI,BHCI,BSCI
+          and ESCI.'
+        explode: true
+        in: query
+        name: edition
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 'This element specifies a range of publication dates. If publishTimeSpan
+          is used, the loadTimeSpan parameter must be omitted. If publishTimeSpan
+          and loadTimeSpan are both omitted, then the maximum time span will be inferred
+          from the editions data. Beginning and end dates should be specified in the
+          yyyy-mm-dd format separated by +, ex: 1993-01-01+2009-12-31.'
+        explode: true
+        in: query
+        name: publishTimeSpan
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 'Load time span (otherwise described as symbolic time span) defines
+          a range of load dates. The load date is the date a record was added to the
+          database. If load date is specified, the publishTimeSpan parameter must
+          be omitted. If both publishTimeSpan and loadTimeSpan are omitted, the maximum
+          publication date will be inferred from the editions data. Any of D/W/M/Y
+          prefixed with a number where D-Day, M-Month, W-Week, Y-Year allowed. Acceptable
+          value range for Day(0-6), Week(1-52), Month(1-12) and Year(0-10), ex: 5D,30W,10M,8Y.'
+        explode: true
+        in: query
+        name: loadTimeSpan
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Number of records to return, must be 0-100.
+        explode: true
+        in: query
+        name: count
+        required: true
+        schema:
+          type: integer
+        style: form
+      - description: Specific record, if any within the result set to return. Cannot
+          be less than 1 and greater than 100000.
+        explode: true
+        in: query
+        name: firstRecord
+        required: true
+        schema:
+          type: integer
+        style: form
+      - description: 'Order by field(s). Field name and order by clause separated
+          by ''+'', use A for ASC and D for DESC, ex: PY+D. Multiple values are separated
+          by comma.'
+        explode: true
+        in: query
+        name: sortField
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WosLiteResponse'
+            application/xml:
+              examples:
+                xml:
+                  summary: Sample response
+                  value: "<response \n  xmlns=\"http://www.isinet.com/xrpc42\">\n\
+                    \  <map>\n    <map name=\"QueryResult\">\n      <map>\n      \
+                    \  <val name=\"QueryID\">81</val>\n        <val name=\"RecordsSearched\"\
+                    >177587322</val>\n        <val name=\"RecordsFound\">1</val>\n\
+                    \      </map>\n    </map>\n    <list name=\"Data\">\n      <map>\n\
+                    \        <val name=\"UT\">WOS:000454864800008</val>\n        <map\
+                    \ name=\"Title\">\n          <list name=\"Title\">\n         \
+                    \   <val>Comparative efficiency of rice husk-derived biochar (RHB)\
+                    \ and steel slag (SS) on cadmium (Cd) mobility and its uptake\
+                    \ by Chinese cabbage in highly contaminated soil</val>\n     \
+                    \     </list>\n        </map>\n        <map name=\"Doctype\">\n\
+                    \          <list name=\"Doctype\">\n            <val>Article</val>\n\
+                    \            <val>Proceedings Paper</val>\n          </list>\n\
+                    \        </map>\n        <map name=\"Source\">\n          <list\
+                    \ name=\"Pages\">\n            <val>1221-1228</val>\n        \
+                    \  </list>\n          <list name=\"SourceTitle\">\n          \
+                    \  <val>INTERNATIONAL JOURNAL OF PHYTOREMEDIATION</val>\n    \
+                    \      </list>\n          <list name=\"Issue\">\n            <val>12</val>\n\
+                    \          </list>\n          <list name=\"Volume\">\n       \
+                    \     <val>20</val>\n          </list>\n          <list name=\"\
+                    SpecialIssue\">\n            <val>SI</val>\n          </list>\n\
+                    \          <list name=\"Published.BiblioDate\">\n            <val>OCT\
+                    \ 15</val>\n          </list>\n          <list name=\"Published.BiblioYear\"\
+                    >\n            <val>2018</val>\n          </list>\n        </map>\n\
+                    \        <map name=\"Author\">\n          <list name=\"Authors\"\
+                    >\n            <val>Bashir, Saqib</val>\n            <val>Salam,\
+                    \ Abdus</val>\n            <val>Chhajro, Muhammad Afzal</val>\n\
+                    \            <val>Fu, Qingling</val>\n            <val>Khan, Muhammad\
+                    \ Jamal</val>\n            <val>Zhu, Jun</val>\n            <val>Shaaban,\
+                    \ Muhammad</val>\n            <val>Kubar, Kashif Ali</val>\n \
+                    \           <val>Ali, Umeed</val>\n            <val>Hu, Hongqing</val>\n\
+                    \          </list>\n        </map>\n        <map name=\"Keyword\"\
+                    >\n          <list name=\"Keywords\">\n            <val>biochar</val>\n\
+                    \            <val>bioaccessibility</val>\n            <val>Chinese\
+                    \ cabbage</val>\n            <val>cadmium</val>\n            <val>immobilization</val>\n\
+                    \            <val>slag</val>\n          </list>\n        </map>\n\
+                    \        <map name=\"Other\">\n          <list name=\"Identifier.Eissn\"\
+                    >\n            <val>1549-7879</val>\n          </list>\n     \
+                    \     <list name=\"Contributor.ResearcherID.ResearcherIDs\">\n\
+                    \            <val>AAA-3943-2020</val>\n            <val>AAF-4859-2020</val>\n\
+                    \            <val>E-6397-2018</val>\n          </list>\n     \
+                    \     <list name=\"Contributor.ResearcherID.Names\">\n       \
+                    \     <val>Hu, Hongqing</val>\n            <val>Salam, Abdus</val>\n\
+                    \            <val>Ali, Umeed</val>\n          </list>\n      \
+                    \    <list name=\"Identifier.Doi\">\n            <val>10.1080/15226514.2018.1448364</val>\n\
+                    \          </list>\n          <list name=\"Identifier.Issn\">\n\
+                    \            <val>1522-6514</val>\n          </list>\n       \
+                    \   <list name=\"ResearcherID.Disclaimer\">\n            <val>ResearcherID\
+                    \ data provided by Clarivate Analytics</val>\n          </list>\n\
+                    \          <list name=\"Identifier.Ids\">\n            <val>HG3HK</val>\n\
+                    \          </list>\n        </map>\n      </map>\n    </list>\n\
+                    \  </map>\n</response>\n"
+              schema:
+                type: object
+          description: Success
+          headers:
+            X-RateLimit-Remaining-second:
+              description: The number of requests left for the second window.
+              explode: false
+              schema:
+                example: 1
+                type: integer
+              style: simple
+            X-RateLimit-Limit-second:
+              description: The number of requests limit per second.
+              explode: false
+              schema:
+                example: 2
+                type: integer
+              style: simple
+            x-paginate-by-query-id:
+              description: |
+                The url of the next page in case your `RecordsFound > count + firstRecord`
+                Please use this url for pagination. The queryId will live for four hours only.
+              explode: false
+              schema:
+                example: https://api.clarivate.com/api/woslite/query/2?count=100&firstRecord=1100
+                type: string
+              style: simple
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Error response 400+
+          headers:
+            X-RateLimit-Remaining-second:
+              description: The number of requests left for the second window.
+              explode: false
+              schema:
+                type: integer
+              style: simple
+            X-RateLimit-Limit-second:
+              description: The number of requests limit per second.
+              explode: false
+              schema:
+                type: integer
+              style: simple
+      summary: Submits a user query and returns results
+      tags:
+      - Search
+      x-accepts: application/json
+  /id/{uniqueId}:
+    get:
+      description: This operation returns a record identified by a unique identifier.
+        You may specify multiple identifiers in a single request.
+      parameters:
+      - description: 'Database to search. Must be a valid database ID, one of the
+          following: BCI/BIOABS/BIOSIS/CCC/DCI/DIIDW/MEDLINE/WOK/WOS/ZOOREC. WOK represents
+          all databases.'
+        explode: true
+        in: query
+        name: databaseId
+        required: true
+        schema:
+          type: string
+        style: form
+      - description: 'Language of search. This element can take only one value: en
+          for English. If no language is specified, English is passed by default.'
+        explode: true
+        in: query
+        name: lang
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 'Primary item(s) id to be searched, ex: WOS:000270372400005.
+          Cannot be null or an empty string. Multiple values are separated by comma.'
+        explode: false
+        in: path
+        name: uniqueId
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Number of records returned in the request
+        explode: true
+        in: query
+        name: count
+        required: true
+        schema:
+          example: 10
+          maximum: 100
+          minimum: 0
+          type: integer
+        style: form
+      - description: Specific record, if any within the result set to return. Cannot
+          be less than 1 and greater than 100000.
+        explode: true
+        in: query
+        name: firstRecord
+        required: true
+        schema:
+          type: integer
+        style: form
+      - description: 'Order by field(s). Field name and order by clause separated
+          by ''+'', use A for ASC and D for DESC, ex: PY+D. Multiple values are separated
+          by comma.'
+        explode: true
+        in: query
+        name: sortField
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WosLiteResponse'
+            application/xml:
+              examples:
+                xml:
+                  summary: A sample response
+                  value: "<response \n  xmlns=\"http://www.isinet.com/xrpc42\">\n\
+                    \  <map>\n    <map name=\"QueryResult\">\n      <map>\n      \
+                    \  <val name=\"QueryID\">81</val>\n        <val name=\"RecordsSearched\"\
+                    >177587322</val>\n        <val name=\"RecordsFound\">1</val>\n\
+                    \      </map>\n    </map>\n    <list name=\"Data\">\n      <map>\n\
+                    \        <val name=\"UT\">WOS:000454864800008</val>\n        <map\
+                    \ name=\"Title\">\n          <list name=\"Title\">\n         \
+                    \   <val>Comparative efficiency of rice husk-derived biochar (RHB)\
+                    \ and steel slag (SS) on cadmium (Cd) mobility and its uptake\
+                    \ by Chinese cabbage in highly contaminated soil</val>\n     \
+                    \     </list>\n        </map>\n        <map name=\"Doctype\">\n\
+                    \          <list name=\"Doctype\">\n            <val>Article</val>\n\
+                    \            <val>Proceedings Paper</val>\n          </list>\n\
+                    \        </map>\n        <map name=\"Source\">\n          <list\
+                    \ name=\"Pages\">\n            <val>1221-1228</val>\n        \
+                    \  </list>\n          <list name=\"SourceTitle\">\n          \
+                    \  <val>INTERNATIONAL JOURNAL OF PHYTOREMEDIATION</val>\n    \
+                    \      </list>\n          <list name=\"Issue\">\n            <val>12</val>\n\
+                    \          </list>\n          <list name=\"Volume\">\n       \
+                    \     <val>20</val>\n          </list>\n          <list name=\"\
+                    SpecialIssue\">\n            <val>SI</val>\n          </list>\n\
+                    \          <list name=\"Published.BiblioDate\">\n            <val>OCT\
+                    \ 15</val>\n          </list>\n          <list name=\"Published.BiblioYear\"\
+                    >\n            <val>2018</val>\n          </list>\n        </map>\n\
+                    \        <map name=\"Author\">\n          <list name=\"Authors\"\
+                    >\n            <val>Bashir, Saqib</val>\n            <val>Salam,\
+                    \ Abdus</val>\n            <val>Chhajro, Muhammad Afzal</val>\n\
+                    \            <val>Fu, Qingling</val>\n            <val>Khan, Muhammad\
+                    \ Jamal</val>\n            <val>Zhu, Jun</val>\n            <val>Shaaban,\
+                    \ Muhammad</val>\n            <val>Kubar, Kashif Ali</val>\n \
+                    \           <val>Ali, Umeed</val>\n            <val>Hu, Hongqing</val>\n\
+                    \          </list>\n        </map>\n        <map name=\"Keyword\"\
+                    >\n          <list name=\"Keywords\">\n            <val>biochar</val>\n\
+                    \            <val>bioaccessibility</val>\n            <val>Chinese\
+                    \ cabbage</val>\n            <val>cadmium</val>\n            <val>immobilization</val>\n\
+                    \            <val>slag</val>\n          </list>\n        </map>\n\
+                    \        <map name=\"Other\">\n          <list name=\"Identifier.Eissn\"\
+                    >\n            <val>1549-7879</val>\n          </list>\n     \
+                    \     <list name=\"Contributor.ResearcherID.ResearcherIDs\">\n\
+                    \            <val>AAA-3943-2020</val>\n            <val>AAF-4859-2020</val>\n\
+                    \            <val>E-6397-2018</val>\n          </list>\n     \
+                    \     <list name=\"Contributor.ResearcherID.Names\">\n       \
+                    \     <val>Hu, Hongqing</val>\n            <val>Salam, Abdus</val>\n\
+                    \            <val>Ali, Umeed</val>\n          </list>\n      \
+                    \    <list name=\"Identifier.Doi\">\n            <val>10.1080/15226514.2018.1448364</val>\n\
+                    \          </list>\n          <list name=\"Identifier.Issn\">\n\
+                    \            <val>1522-6514</val>\n          </list>\n       \
+                    \   <list name=\"ResearcherID.Disclaimer\">\n            <val>ResearcherID\
+                    \ data provided by Clarivate Analytics</val>\n          </list>\n\
+                    \          <list name=\"Identifier.Ids\">\n            <val>HG3HK</val>\n\
+                    \          </list>\n        </map>\n      </map>\n    </list>\n\
+                    \  </map>\n</response>\n"
+              schema:
+                type: object
+          description: Success
+          headers:
+            X-RateLimit-Remaining-second:
+              description: The number of requests left for the second window.
+              explode: false
+              schema:
+                example: 1
+                type: integer
+              style: simple
+            X-RateLimit-Limit-second:
+              description: The number of requests limit per second.
+              explode: false
+              schema:
+                example: 2
+                type: integer
+              style: simple
+            x-paginate-by-query-id:
+              description: |
+                The url of the next page in case your `RecordsFound > count + firstRecord`
+                Please use this url for pagination. The queryId will live for four hours only.
+              explode: false
+              schema:
+                example: https://api.clarivate.com/api/woslite/query/2?count=100&firstRecord=1100
+                type: string
+              style: simple
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Error response 400+
+          headers:
+            X-RateLimit-Remaining-second:
+              description: The number of requests left for the second window.
+              explode: false
+              schema:
+                type: integer
+              style: simple
+            X-RateLimit-Limit-second:
+              description: The number of requests limit per second.
+              explode: false
+              schema:
+                type: integer
+              style: simple
+      summary: Find record(s) by specific id
+      tags:
+      - Integration
+      x-accepts: application/json
+  /query/{queryId}:
+    get:
+      description: This operation returns record(s) identified by a query identifier.
+      parameters:
+      - description: Retrieve records based on query identifier.
+        explode: false
+        in: path
+        name: queryId
+        required: true
+        schema:
+          type: integer
+        style: simple
+      - description: Number of records to return, must be 0-100.
+        explode: true
+        in: query
+        name: count
+        required: true
+        schema:
+          type: integer
+        style: form
+      - description: Specific record, if any within the result set to return. Cannot
+          be less than 1 and greater than 100000.
+        explode: true
+        in: query
+        name: firstRecord
+        required: true
+        schema:
+          type: integer
+        style: form
+      - description: 'Order by field(s). Field name and order by clause separated
+          by ''+'', use A for ASC and D for DESC, ex: PY+D. Multiple values are separated
+          by comma. If sortField was set on the original query, this parameter should
+          be set as sorting is not a property of the query.'
+        explode: true
+        in: query
+        name: sortField
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WosLiteResponse'
+            application/xml:
+              examples:
+                xml:
+                  summary: A sample response
+                  value: "<response \n  xmlns=\"http://www.isinet.com/xrpc42\">\n\
+                    \  <map>\n    <map name=\"QueryResult\">\n      <map>\n      \
+                    \  <val name=\"QueryID\">81</val>\n        <val name=\"RecordsSearched\"\
+                    >177587322</val>\n        <val name=\"RecordsFound\">1</val>\n\
+                    \      </map>\n    </map>\n    <list name=\"Data\">\n      <map>\n\
+                    \        <val name=\"UT\">WOS:000454864800008</val>\n        <map\
+                    \ name=\"Title\">\n          <list name=\"Title\">\n         \
+                    \   <val>Comparative efficiency of rice husk-derived biochar (RHB)\
+                    \ and steel slag (SS) on cadmium (Cd) mobility and its uptake\
+                    \ by Chinese cabbage in highly contaminated soil</val>\n     \
+                    \     </list>\n        </map>\n        <map name=\"Doctype\">\n\
+                    \          <list name=\"Doctype\">\n            <val>Article</val>\n\
+                    \            <val>Proceedings Paper</val>\n          </list>\n\
+                    \        </map>\n        <map name=\"Source\">\n          <list\
+                    \ name=\"Pages\">\n            <val>1221-1228</val>\n        \
+                    \  </list>\n          <list name=\"SourceTitle\">\n          \
+                    \  <val>INTERNATIONAL JOURNAL OF PHYTOREMEDIATION</val>\n    \
+                    \      </list>\n          <list name=\"Issue\">\n            <val>12</val>\n\
+                    \          </list>\n          <list name=\"Volume\">\n       \
+                    \     <val>20</val>\n          </list>\n          <list name=\"\
+                    SpecialIssue\">\n            <val>SI</val>\n          </list>\n\
+                    \          <list name=\"Published.BiblioDate\">\n            <val>OCT\
+                    \ 15</val>\n          </list>\n          <list name=\"Published.BiblioYear\"\
+                    >\n            <val>2018</val>\n          </list>\n        </map>\n\
+                    \        <map name=\"Author\">\n          <list name=\"Authors\"\
+                    >\n            <val>Bashir, Saqib</val>\n            <val>Salam,\
+                    \ Abdus</val>\n            <val>Chhajro, Muhammad Afzal</val>\n\
+                    \            <val>Fu, Qingling</val>\n            <val>Khan, Muhammad\
+                    \ Jamal</val>\n            <val>Zhu, Jun</val>\n            <val>Shaaban,\
+                    \ Muhammad</val>\n            <val>Kubar, Kashif Ali</val>\n \
+                    \           <val>Ali, Umeed</val>\n            <val>Hu, Hongqing</val>\n\
+                    \          </list>\n        </map>\n        <map name=\"Keyword\"\
+                    >\n          <list name=\"Keywords\">\n            <val>biochar</val>\n\
+                    \            <val>bioaccessibility</val>\n            <val>Chinese\
+                    \ cabbage</val>\n            <val>cadmium</val>\n            <val>immobilization</val>\n\
+                    \            <val>slag</val>\n          </list>\n        </map>\n\
+                    \        <map name=\"Other\">\n          <list name=\"Identifier.Eissn\"\
+                    >\n            <val>1549-7879</val>\n          </list>\n     \
+                    \     <list name=\"Contributor.ResearcherID.ResearcherIDs\">\n\
+                    \            <val>AAA-3943-2020</val>\n            <val>AAF-4859-2020</val>\n\
+                    \            <val>E-6397-2018</val>\n          </list>\n     \
+                    \     <list name=\"Contributor.ResearcherID.Names\">\n       \
+                    \     <val>Hu, Hongqing</val>\n            <val>Salam, Abdus</val>\n\
+                    \            <val>Ali, Umeed</val>\n          </list>\n      \
+                    \    <list name=\"Identifier.Doi\">\n            <val>10.1080/15226514.2018.1448364</val>\n\
+                    \          </list>\n          <list name=\"Identifier.Issn\">\n\
+                    \            <val>1522-6514</val>\n          </list>\n       \
+                    \   <list name=\"ResearcherID.Disclaimer\">\n            <val>ResearcherID\
+                    \ data provided by Clarivate Analytics</val>\n          </list>\n\
+                    \          <list name=\"Identifier.Ids\">\n            <val>HG3HK</val>\n\
+                    \          </list>\n        </map>\n      </map>\n    </list>\n\
+                    \  </map>\n</response>\n"
+              schema:
+                type: object
+          description: Success
+          headers:
+            X-RateLimit-Remaining-second:
+              description: The number of requests left for the second window.
+              explode: false
+              schema:
+                example: 1
+                type: integer
+              style: simple
+            X-RateLimit-Limit-second:
+              description: The number of requests limit per second.
+              explode: false
+              schema:
+                example: 2
+                type: integer
+              style: simple
+            x-paginate-by-query-id:
+              description: |
+                The url of the next page in case your `RecordsFound > count + firstRecord`
+                Please use this url for pagination. The QueryId will live for four hours in case if inactivity.
+              explode: false
+              schema:
+                example: https://api.clarivate.com/api/woslite/query/2?count=100&firstRecord=1100
+                type: string
+              style: simple
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Error response 400+
+          headers:
+            X-RateLimit-Remaining-second:
+              description: The number of requests left for the second window.
+              explode: false
+              schema:
+                type: integer
+              style: simple
+            X-RateLimit-Limit-second:
+              description: The number of requests limit per second.
+              explode: false
+              schema:
+                type: integer
+              style: simple
+      summary: Fetch record(s) by query identifier
+      tags:
+      - Search
+      x-accepts: application/json
+components:
+  schemas:
+    WosLiteResponse:
+      example:
+        QueryResult:
+          RecordsFound: 17
+          QueryID: 1
+          RecordsSearched: 177587322
+        Data:
+        - Keyword:
+            Keywords:
+            - biochar
+            - bioaccessibility
+            - Chinese cabbage
+            - cadmium
+            - immobilization
+            - slag
+          Title:
+            Title:
+            - Comparative efficiency of rice husk-derived biochar (RHB) and steel
+              slag (SS) on cadmium (Cd) mobility and its uptake by Chinese cabbage
+              in highly contaminated soil
+            - Comparative efficiency of rice husk-derived biochar (RHB) and steel
+              slag (SS) on cadmium (Cd) mobility and its uptake by Chinese cabbage
+              in highly contaminated soil
+          Doctype:
+            Doctype:
+            - Article
+            - Proceeding paper
+          Author:
+            Authors:
+            - Bashir, Saqib
+            - Salam, Abdus
+            - Chhajro, Muhammad Afzal
+            - Fu, Qingling
+            - Khan, Muhammad Jamal
+            - Zhu, Jun
+            - Shaaban, Muhammad
+            - Kubar, Kashif Ali
+            - Ali, Umeed
+            - Hu, Hongqing
+            BookAuthors:
+            - Miller, DS
+            - Rivera, JD
+            BookGroupAuthors:
+            - ASME
+            - ASME
+          Source:
+            Pages:
+            - 378-383
+            - 378-383
+            SourceTitle:
+            - INTERNATIONAL JOURNAL OF PHYTOREMEDIATION
+            - INTERNATIONAL JOURNAL OF PHYTOREMEDIATION
+            Issue:
+            - "12"
+            - "12"
+            Volume:
+            - "20"
+            - "20"
+            SpecialIssue:
+            - SI
+            - SI
+            Published.BiblioDate:
+            - OCT 15
+            - OCT 15
+            BookSeriesTitle:
+            - Progress in Heterocyclic Chemistry
+            - Progress in Heterocyclic Chemistry
+            Published.BiblioYear:
+            - "2018"
+            - "2018"
+          UT: WOS:000454864800008
+          Other:
+            Identifier.Eissn:
+            - 1549-7879
+            - 1549-7879
+            Contributor.ResearcherID.ResearcherIDs:
+            - '["AAA-3943-2020","AAF-4859-2020","E-6397-2018"]'
+            - '["AAA-3943-2020","AAF-4859-2020","E-6397-2018"]'
+            Contributor.ResearcherID.Names:
+            - '["Hu, Hongqing","Salam, Abdus","Ali, Umeed"]'
+            - '["Hu, Hongqing","Salam, Abdus","Ali, Umeed"]'
+            Identifier.Doi:
+            - 10.1080/15226514.2018.1448364
+            - 10.1080/15226514.2018.1448364
+            Identifier.article_no:
+            - ARTN V011T14A004
+            - ARTN V011T14A004
+            Identifier.Isbn:
+            - 978-1-4398-0492-6
+            - 978-1-4398-0492-6
+            Identifier.Issn:
+            - 1522-6514
+            - 1522-6514
+            ResearcherID.Disclaimer:
+            - ResearcherID data provided by Clarivate Analytics
+            - ResearcherID data provided by Clarivate Analytics
+            Identifier.Xref_Doi:
+            - 10.1080/15226514.2018.1448364
+            - 10.1080/15226514.2018.1448364
+            Identifier.Ids:
+            - HG3HK
+            - HG3HK
+        - Keyword:
+            Keywords:
+            - biochar
+            - bioaccessibility
+            - Chinese cabbage
+            - cadmium
+            - immobilization
+            - slag
+          Title:
+            Title:
+            - Comparative efficiency of rice husk-derived biochar (RHB) and steel
+              slag (SS) on cadmium (Cd) mobility and its uptake by Chinese cabbage
+              in highly contaminated soil
+            - Comparative efficiency of rice husk-derived biochar (RHB) and steel
+              slag (SS) on cadmium (Cd) mobility and its uptake by Chinese cabbage
+              in highly contaminated soil
+          Doctype:
+            Doctype:
+            - Article
+            - Proceeding paper
+          Author:
+            Authors:
+            - Bashir, Saqib
+            - Salam, Abdus
+            - Chhajro, Muhammad Afzal
+            - Fu, Qingling
+            - Khan, Muhammad Jamal
+            - Zhu, Jun
+            - Shaaban, Muhammad
+            - Kubar, Kashif Ali
+            - Ali, Umeed
+            - Hu, Hongqing
+            BookAuthors:
+            - Miller, DS
+            - Rivera, JD
+            BookGroupAuthors:
+            - ASME
+            - ASME
+          Source:
+            Pages:
+            - 378-383
+            - 378-383
+            SourceTitle:
+            - INTERNATIONAL JOURNAL OF PHYTOREMEDIATION
+            - INTERNATIONAL JOURNAL OF PHYTOREMEDIATION
+            Issue:
+            - "12"
+            - "12"
+            Volume:
+            - "20"
+            - "20"
+            SpecialIssue:
+            - SI
+            - SI
+            Published.BiblioDate:
+            - OCT 15
+            - OCT 15
+            BookSeriesTitle:
+            - Progress in Heterocyclic Chemistry
+            - Progress in Heterocyclic Chemistry
+            Published.BiblioYear:
+            - "2018"
+            - "2018"
+          UT: WOS:000454864800008
+          Other:
+            Identifier.Eissn:
+            - 1549-7879
+            - 1549-7879
+            Contributor.ResearcherID.ResearcherIDs:
+            - '["AAA-3943-2020","AAF-4859-2020","E-6397-2018"]'
+            - '["AAA-3943-2020","AAF-4859-2020","E-6397-2018"]'
+            Contributor.ResearcherID.Names:
+            - '["Hu, Hongqing","Salam, Abdus","Ali, Umeed"]'
+            - '["Hu, Hongqing","Salam, Abdus","Ali, Umeed"]'
+            Identifier.Doi:
+            - 10.1080/15226514.2018.1448364
+            - 10.1080/15226514.2018.1448364
+            Identifier.article_no:
+            - ARTN V011T14A004
+            - ARTN V011T14A004
+            Identifier.Isbn:
+            - 978-1-4398-0492-6
+            - 978-1-4398-0492-6
+            Identifier.Issn:
+            - 1522-6514
+            - 1522-6514
+            ResearcherID.Disclaimer:
+            - ResearcherID data provided by Clarivate Analytics
+            - ResearcherID data provided by Clarivate Analytics
+            Identifier.Xref_Doi:
+            - 10.1080/15226514.2018.1448364
+            - 10.1080/15226514.2018.1448364
+            Identifier.Ids:
+            - HG3HK
+            - HG3HK
+      properties:
+        QueryResult:
+          $ref: '#/components/schemas/QueryResult'
+        Data:
+          description: The array of the Web of Science records
+          items:
+            $ref: '#/components/schemas/WosLiteRecord'
+          type: array
+      type: object
+    QueryResult:
+      example:
+        RecordsFound: 17
+        QueryID: 1
+        RecordsSearched: 177587322
+      properties:
+        QueryID:
+          description: "The ID of the query that can be used for pagination. \nNote:\
+            \ The id will expire after four hours (session duration) and during a\
+            \ session you can have maximum 2,500 Queries. \nThe QueryIDs will be reused\
+            \ (starting from 1) if more than 2,500 queries are requested within a\
+            \ session. \nThe session will expire after four hours inactivity, \ni.e.\
+            \ no requests with the token. \nUse always `x-paginate-by-query-id` Header\
+            \ to paginate through records. The response time will be faster by using\
+            \ QueryID.\n"
+          example: 1
+          format: int32
+          type: integer
+        RecordsSearched:
+          description: The overrall number of records available in Web of Science.
+          example: 177587322
+          format: int64
+          type: integer
+        RecordsFound:
+          description: The number of records of your request that are filtered through
+            usrQuery but as well other query parameters.
+          example: 17
+          format: int64
+          type: integer
+      type: object
+    WosLiteRecord:
+      example:
+        Keyword:
+          Keywords:
+          - biochar
+          - bioaccessibility
+          - Chinese cabbage
+          - cadmium
+          - immobilization
+          - slag
+        Title:
+          Title:
+          - Comparative efficiency of rice husk-derived biochar (RHB) and steel slag
+            (SS) on cadmium (Cd) mobility and its uptake by Chinese cabbage in highly
+            contaminated soil
+          - Comparative efficiency of rice husk-derived biochar (RHB) and steel slag
+            (SS) on cadmium (Cd) mobility and its uptake by Chinese cabbage in highly
+            contaminated soil
+        Doctype:
+          Doctype:
+          - Article
+          - Proceeding paper
+        Author:
+          Authors:
+          - Bashir, Saqib
+          - Salam, Abdus
+          - Chhajro, Muhammad Afzal
+          - Fu, Qingling
+          - Khan, Muhammad Jamal
+          - Zhu, Jun
+          - Shaaban, Muhammad
+          - Kubar, Kashif Ali
+          - Ali, Umeed
+          - Hu, Hongqing
+          BookAuthors:
+          - Miller, DS
+          - Rivera, JD
+          BookGroupAuthors:
+          - ASME
+          - ASME
+        Source:
+          Pages:
+          - 378-383
+          - 378-383
+          SourceTitle:
+          - INTERNATIONAL JOURNAL OF PHYTOREMEDIATION
+          - INTERNATIONAL JOURNAL OF PHYTOREMEDIATION
+          Issue:
+          - "12"
+          - "12"
+          Volume:
+          - "20"
+          - "20"
+          SpecialIssue:
+          - SI
+          - SI
+          Published.BiblioDate:
+          - OCT 15
+          - OCT 15
+          BookSeriesTitle:
+          - Progress in Heterocyclic Chemistry
+          - Progress in Heterocyclic Chemistry
+          Published.BiblioYear:
+          - "2018"
+          - "2018"
+        UT: WOS:000454864800008
+        Other:
+          Identifier.Eissn:
+          - 1549-7879
+          - 1549-7879
+          Contributor.ResearcherID.ResearcherIDs:
+          - '["AAA-3943-2020","AAF-4859-2020","E-6397-2018"]'
+          - '["AAA-3943-2020","AAF-4859-2020","E-6397-2018"]'
+          Contributor.ResearcherID.Names:
+          - '["Hu, Hongqing","Salam, Abdus","Ali, Umeed"]'
+          - '["Hu, Hongqing","Salam, Abdus","Ali, Umeed"]'
+          Identifier.Doi:
+          - 10.1080/15226514.2018.1448364
+          - 10.1080/15226514.2018.1448364
+          Identifier.article_no:
+          - ARTN V011T14A004
+          - ARTN V011T14A004
+          Identifier.Isbn:
+          - 978-1-4398-0492-6
+          - 978-1-4398-0492-6
+          Identifier.Issn:
+          - 1522-6514
+          - 1522-6514
+          ResearcherID.Disclaimer:
+          - ResearcherID data provided by Clarivate Analytics
+          - ResearcherID data provided by Clarivate Analytics
+          Identifier.Xref_Doi:
+          - 10.1080/15226514.2018.1448364
+          - 10.1080/15226514.2018.1448364
+          Identifier.Ids:
+          - HG3HK
+          - HG3HK
+      properties:
+        UT:
+          description: The unique identifier of Web of Science Record
+          example: WOS:000454864800008
+          type: string
+        Title:
+          $ref: '#/components/schemas/WosLiteRecord_Title'
+        Doctype:
+          $ref: '#/components/schemas/Doctype'
+        Source:
+          $ref: '#/components/schemas/Source'
+        Author:
+          $ref: '#/components/schemas/Author'
+        Keyword:
+          $ref: '#/components/schemas/Keyword'
+        Other:
+          $ref: '#/components/schemas/Other'
+      type: object
+    ErrorResponse:
+      properties:
+        code:
+          description: The error code (mostly the HTTP status description)
+          example: Bad Request
+          type: string
+        message:
+          description: A detailed message of the error that helps you to correct your
+            request.
+          example: 'Server.Parser.ILL_TAG_NAME, Translation Exception : Illegal tag
+            name UNKOWN'
+          type: string
+        id:
+          description: The request ID which can be used for investigation purposes.
+          example: ee9735b3-584a-40e1-ac42-01f85a653fcf
+          type: string
+      type: object
+      xml:
+        name: error
+        namespace: http://www.isinet.com/xrpc42
+    Source:
+      description: The source of this article; journal, book or medium in which the
+        document was published
+      example:
+        Pages:
+        - 378-383
+        - 378-383
+        SourceTitle:
+        - INTERNATIONAL JOURNAL OF PHYTOREMEDIATION
+        - INTERNATIONAL JOURNAL OF PHYTOREMEDIATION
+        Issue:
+        - "12"
+        - "12"
+        Volume:
+        - "20"
+        - "20"
+        SpecialIssue:
+        - SI
+        - SI
+        Published.BiblioDate:
+        - OCT 15
+        - OCT 15
+        BookSeriesTitle:
+        - Progress in Heterocyclic Chemistry
+        - Progress in Heterocyclic Chemistry
+        Published.BiblioYear:
+        - "2018"
+        - "2018"
+      properties:
+        Pages:
+          description: Pages range in the source
+          items:
+            example: 378-383
+            type: string
+          type: array
+        SourceTitle:
+          description: The title of the source in which the document was published
+          items:
+            example: INTERNATIONAL JOURNAL OF PHYTOREMEDIATION
+            type: string
+          type: array
+        Issue:
+          description: Issue Number
+          items:
+            example: "12"
+            type: string
+          type: array
+        Volume:
+          description: Volume number
+          items:
+            example: "20"
+            type: string
+          type: array
+        SpecialIssue:
+          description: Special issue, in case was published to a special issue journal
+          items:
+            example: SI
+            type: string
+          type: array
+        BookSeriesTitle:
+          description: Book series title - in case the article is published in book
+            series
+          items:
+            example: Progress in Heterocyclic Chemistry
+            type: string
+          type: array
+        Published.BiblioDate:
+          description: Published Date
+          items:
+            example: OCT 15
+            type: string
+          type: array
+        Published.BiblioYear:
+          description: Published Year
+          items:
+            example: "2018"
+            type: string
+          type: array
+      type: object
+    Doctype:
+      description: The document types of record
+      example:
+        Doctype:
+        - Article
+        - Proceeding paper
+      properties:
+        Doctype:
+          example:
+          - Article
+          - Proceeding paper
+          items:
+            type: string
+          type: array
+      type: object
+    Author:
+      description: The source authors
+      example:
+        Authors:
+        - Bashir, Saqib
+        - Salam, Abdus
+        - Chhajro, Muhammad Afzal
+        - Fu, Qingling
+        - Khan, Muhammad Jamal
+        - Zhu, Jun
+        - Shaaban, Muhammad
+        - Kubar, Kashif Ali
+        - Ali, Umeed
+        - Hu, Hongqing
+        BookAuthors:
+        - Miller, DS
+        - Rivera, JD
+        BookGroupAuthors:
+        - ASME
+        - ASME
+      properties:
+        Authors:
+          example:
+          - Bashir, Saqib
+          - Salam, Abdus
+          - Chhajro, Muhammad Afzal
+          - Fu, Qingling
+          - Khan, Muhammad Jamal
+          - Zhu, Jun
+          - Shaaban, Muhammad
+          - Kubar, Kashif Ali
+          - Ali, Umeed
+          - Hu, Hongqing
+          items:
+            type: string
+          type: array
+        BookAuthors:
+          example:
+          - Miller, DS
+          - Rivera, JD
+          items:
+            type: string
+          type: array
+        BookGroupAuthors:
+          description: Book authors if In case of a book series
+          items:
+            example: ASME
+            type: string
+          type: array
+      type: object
+    Keyword:
+      description: Author keyowrds
+      example:
+        Keywords:
+        - biochar
+        - bioaccessibility
+        - Chinese cabbage
+        - cadmium
+        - immobilization
+        - slag
+      properties:
+        Keywords:
+          example:
+          - biochar
+          - bioaccessibility
+          - Chinese cabbage
+          - cadmium
+          - immobilization
+          - slag
+          items:
+            type: string
+          type: array
+      type: object
+    Other:
+      description: The source of this article; journal, book or medium in which the
+        document was published
+      example:
+        Identifier.Eissn:
+        - 1549-7879
+        - 1549-7879
+        Contributor.ResearcherID.ResearcherIDs:
+        - '["AAA-3943-2020","AAF-4859-2020","E-6397-2018"]'
+        - '["AAA-3943-2020","AAF-4859-2020","E-6397-2018"]'
+        Contributor.ResearcherID.Names:
+        - '["Hu, Hongqing","Salam, Abdus","Ali, Umeed"]'
+        - '["Hu, Hongqing","Salam, Abdus","Ali, Umeed"]'
+        Identifier.Doi:
+        - 10.1080/15226514.2018.1448364
+        - 10.1080/15226514.2018.1448364
+        Identifier.article_no:
+        - ARTN V011T14A004
+        - ARTN V011T14A004
+        Identifier.Isbn:
+        - 978-1-4398-0492-6
+        - 978-1-4398-0492-6
+        Identifier.Issn:
+        - 1522-6514
+        - 1522-6514
+        ResearcherID.Disclaimer:
+        - ResearcherID data provided by Clarivate Analytics
+        - ResearcherID data provided by Clarivate Analytics
+        Identifier.Xref_Doi:
+        - 10.1080/15226514.2018.1448364
+        - 10.1080/15226514.2018.1448364
+        Identifier.Ids:
+        - HG3HK
+        - HG3HK
+      properties:
+        Identifier.Eissn:
+          description: Electronic International Standard Identifier Number. [What
+            is an ISSN?](https://www.issn.org/understanding-the-issn/what-is-an-issn/)
+          items:
+            example: 1549-7879
+            type: string
+          type: array
+        Contributor.ResearcherID.ResearcherIDs:
+          description: ResearcherID provided from Web of Science. [What is my Web
+            of Science ResearcherID?](https://publons.freshdesk.com/support/solutions/articles/12000038281-what-is-my-web-of-science-researcherid-)
+          items:
+            example: '["AAA-3943-2020","AAF-4859-2020","E-6397-2018"]'
+            type: string
+          type: array
+        Contributor.ResearcherID.Names:
+          description: The author names in the same order from `Contributor.ResearcherID.ResearcherIDs`
+          items:
+            example: '["Hu, Hongqing","Salam, Abdus","Ali, Umeed"]'
+            type: string
+          type: array
+        Identifier.Doi:
+          description: Digital Object Identifier
+          items:
+            example: 10.1080/15226514.2018.1448364
+            type: string
+          type: array
+        Identifier.Issn:
+          description: International Standard Identifier Number. [What is an ISSN?](https://www.issn.org/understanding-the-issn/what-is-an-issn/)
+          items:
+            example: 1522-6514
+            type: string
+          type: array
+        Identifier.article_no:
+          description: Article Number
+          items:
+            example: ARTN V011T14A004
+            type: string
+          type: array
+        Identifier.Isbn:
+          description: International Standard Book Number. [What is an ISBN?](https://www.isbn-international.org/content/what-isbn)
+          items:
+            example: 978-1-4398-0492-6
+            type: string
+          type: array
+        ResearcherID.Disclaimer:
+          description: Dislaimer for ResearcherID
+          items:
+            default: ResearcherID data provided by Clarivate Analytics
+            enum:
+            - ResearcherID data provided by Clarivate Analytics
+            type: string
+          type: array
+        Identifier.Xref_Doi:
+          description: Digital Object Identifier
+          items:
+            example: 10.1080/15226514.2018.1448364
+            type: string
+          type: array
+        Identifier.Ids:
+          description: The IDS Number is included in the export from Web of Science
+            to Researcher Solutions products. The ISI Document Delivery Number is
+            used to uniquely identify documents that can be delivered via IDS. It
+            is of no particular use if the user does not wish to use our document
+            delivery.
+          items:
+            example: HG3HK
+            type: string
+          type: array
+      type: object
+    WosLiteRecord_Title:
+      description: The titles for this record
+      example:
+        Title:
+        - Comparative efficiency of rice husk-derived biochar (RHB) and steel slag
+          (SS) on cadmium (Cd) mobility and its uptake by Chinese cabbage in highly
+          contaminated soil
+        - Comparative efficiency of rice husk-derived biochar (RHB) and steel slag
+          (SS) on cadmium (Cd) mobility and its uptake by Chinese cabbage in highly
+          contaminated soil
+      properties:
+        Title:
+          items:
+            example: Comparative efficiency of rice husk-derived biochar (RHB) and
+              steel slag (SS) on cadmium (Cd) mobility and its uptake by Chinese cabbage
+              in highly contaminated soil
+            type: string
+          type: array
+      type: object
+  securitySchemes:
+    key:
+      in: header
+      name: X-ApiKey
+      type: apiKey
+
