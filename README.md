@@ -46,7 +46,7 @@ Clone the repository and include in your project
 At first generate the JAR by executing:
 
 ```shell
-gradle clean build
+gradlew clean build
 ```
 
 
